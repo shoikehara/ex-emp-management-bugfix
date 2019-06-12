@@ -79,14 +79,17 @@ public class AdministratorController {
 			return toInsert();
 		}
 		String checkToken = (String)session.getAttribute("token");
-		System.out.println(hidden);
-		System.out.println(checkToken);
 		if(checkToken.equals(hidden)) {
-			session.removeAttribute("token");
-			Administrator administrator = new Administrator();
-			// フォームからドメインにプロパティ値をコピー
-			BeanUtils.copyProperties(form, administrator);
-			administratorService.insert(administrator);
+			Administrator administrator = administratorService.findMailAddress(form.getMailAddress());
+			if(administrator == null) {
+				session.removeAttribute("token");
+				BeanUtils.copyProperties(form, administrator);
+				administratorService.insert(administrator);				
+
+			}else {
+				result.addError(new ObjectError("insertError", "既に登録されているメールアドレスです。"));
+				return toInsert();
+			}
 		}
 		return toLogin();
 	}
@@ -101,8 +104,6 @@ public class AdministratorController {
 	 */
 	@RequestMapping("/")
 	public String toLogin() {
-		String token = UUID.randomUUID().toString();
-		session.setAttribute("token", token);
 		return "administrator/login";
 	}
 
@@ -120,14 +121,10 @@ public class AdministratorController {
 		if(result.hasErrors()) {
 			return toLogin();
 		}
-		String checkToken = (String)session.getAttribute("token");
-		if(checkToken.equals(hidden)) {
-			session.removeAttribute("token");
-			Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
-			if (administrator == null) {
-				result.addError(new ObjectError("loginError", "メールアドレスまたはパスワードが不正です。"));
-				return toLogin();
-			}
+		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
+		if (administrator == null) {
+			result.addError(new ObjectError("loginError", "メールアドレスまたはパスワードが不正です。"));
+			return toLogin();
 		}
 		return "redirect:employee/showList";
 	}
