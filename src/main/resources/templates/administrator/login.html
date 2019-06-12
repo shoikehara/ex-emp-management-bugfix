@@ -48,7 +48,6 @@
 								<span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red">エラー！</span>
 								<input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" th:value="*{password}">
 							</div>
-							<input type="hidden" th:value="${session.token}" name="hidden">
 							<div class="form-group">
 								<button type="submit" class="btn btn-primary">ログイン</button>
 							</div>

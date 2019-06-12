@@ -74,12 +74,12 @@ public class AdministratorController {
 	 * @return ログイン画面へリダイレクト
 	 */
 	@RequestMapping("/insert")
-	public String insert(@Validated InsertAdministratorForm form,BindingResult result,String hidden) {
+	public String insert(@Validated InsertAdministratorForm form,BindingResult result,String token) {
 		if(result.hasErrors()) {
 			return toInsert();
 		}
 		String checkToken = (String)session.getAttribute("token");
-		if(checkToken.equals(hidden)) {
+		if(checkToken.equals(token)) {
 			Administrator administrator = administratorService.findMailAddress(form.getMailAddress());
 			if(administrator == null) {
 				session.removeAttribute("token");
@@ -117,7 +117,7 @@ public class AdministratorController {
 	 * @return ログイン後の従業員一覧画面
 	 */
 	@RequestMapping("/login")
-	public String login(@Validated LoginForm form, BindingResult result, Model model,String hidden) {
+	public String login(@Validated LoginForm form, BindingResult result, Model model) {
 		if(result.hasErrors()) {
 			return toLogin();
 		}
