@@ -36,9 +36,7 @@
 							<legend>管理者登録<br>(システムにログインできる管理者を登録します)</legend>
 							<!-- 氏名 -->
 							<div class="form-group">
-								<div class="alert alert-danger" th:if="${errorMessage}">
-			                        <p th:text="${errorMessage}">エラー！</p>
-			                    </div>
+								<div th:if="${insertError != null}" th:text="${insertError}" class="alert alert-danger">エラー！</div>
 								<div class="row">
 									<div class="col-sm-12">
 										<label for="name">

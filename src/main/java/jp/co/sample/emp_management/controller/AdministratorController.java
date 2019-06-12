@@ -74,7 +74,7 @@ public class AdministratorController {
 	 * @return ログイン画面へリダイレクト
 	 */
 	@RequestMapping("/insert")
-	public String insert(@Validated InsertAdministratorForm form,BindingResult result,String token) {
+	public String insert(@Validated InsertAdministratorForm form,BindingResult result,String token,Model model) {
 		if(result.hasErrors()) {
 			return toInsert();
 		}
@@ -85,9 +85,8 @@ public class AdministratorController {
 				session.removeAttribute("token");
 				BeanUtils.copyProperties(form, administrator);
 				administratorService.insert(administrator);				
-
 			}else {
-				result.addError(new ObjectError("insertError", "既に登録されているメールアドレスです。"));
+				model.addAttribute("insertError", "既に登録されているメールアドレスです。");
 				return toInsert();
 			}
 		}
@@ -123,7 +122,7 @@ public class AdministratorController {
 		}
 		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
 		if (administrator == null) {
-			result.addError(new ObjectError("loginError", "メールアドレスまたはパスワードが不正です。"));
+			model.addAttribute("loginError", "メールアドレスまたはパスワードが不正です。");
 			return toLogin();
 		}
 		return "redirect:employee/showList";
