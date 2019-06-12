@@ -81,9 +81,14 @@ public class AdministratorController {
 		if(checkToken.equals(token)) {
 			Administrator administrator = administratorService.findMailAddress(form.getMailAddress());
 			if(administrator == null) {
-				session.removeAttribute("token");
-				BeanUtils.copyProperties(form, administrator);
-				administratorService.insert(administrator);				
+				if(form.getPassword().equals(form.getCheckPassword())) {
+					session.removeAttribute("token");
+					BeanUtils.copyProperties(form, administrator);
+					administratorService.insert(administrator);
+				}else {
+					model.addAttribute("checkPasswordError", "入力したメールアドレスが一致しません");
+					return toInsert();
+				}
 			}else {
 				model.addAttribute("insertError", "既に登録されているメールアドレスです。");
 				return toInsert();
