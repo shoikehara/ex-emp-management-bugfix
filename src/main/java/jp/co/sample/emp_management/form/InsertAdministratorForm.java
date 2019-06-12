@@ -19,7 +19,7 @@ public class InsertAdministratorForm {
 	@Email(message="Eメールの形式が不正です")
 	private String mailAddress;
 	/** パスワード */
-	@Size(min=4,max=30,message="パスワードは1文字以上30文字以下で入力してください")
+	@Size(min=4,max=30,message="パスワードは4文字以上30文字以下で入力してください")
 	private String password;
 	public String getName() {
 		return name;

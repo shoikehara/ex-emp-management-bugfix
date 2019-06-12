@@ -1,5 +1,7 @@
 package jp.co.sample.emp_management.controller;
 
+import java.util.UUID;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.BeanUtils;
@@ -59,6 +61,8 @@ public class AdministratorController {
 	 */
 	@RequestMapping("/toInsert")
 	public String toInsert() {
+		String token = UUID.randomUUID().toString();
+		session.setAttribute("token", token);
 		return "administrator/insert";
 	}
 
@@ -70,14 +74,20 @@ public class AdministratorController {
 	 * @return ログイン画面へリダイレクト
 	 */
 	@RequestMapping("/insert")
-	public String insert(@Validated InsertAdministratorForm form,BindingResult result) {
+	public String insert(@Validated InsertAdministratorForm form,BindingResult result,String hidden) {
 		if(result.hasErrors()) {
 			return toInsert();
 		}
-		Administrator administrator = new Administrator();
-		// フォームからドメインにプロパティ値をコピー
-		BeanUtils.copyProperties(form, administrator);
-		administratorService.insert(administrator);
+		String checkToken = (String)session.getAttribute("token");
+		System.out.println(hidden);
+		System.out.println(checkToken);
+		if(checkToken.equals(hidden)) {
+			session.removeAttribute("token");
+			Administrator administrator = new Administrator();
+			// フォームからドメインにプロパティ値をコピー
+			BeanUtils.copyProperties(form, administrator);
+			administratorService.insert(administrator);
+		}
 		return "administrator/login";
 	}
 
@@ -91,6 +101,8 @@ public class AdministratorController {
 	 */
 	@RequestMapping("/")
 	public String toLogin() {
+		String token = UUID.randomUUID().toString();
+		session.setAttribute("token", token);
 		return "administrator/login";
 	}
 
@@ -104,14 +116,18 @@ public class AdministratorController {
 	 * @return ログイン後の従業員一覧画面
 	 */
 	@RequestMapping("/login")
-	public String login(@Validated LoginForm form, BindingResult result, Model model) {
+	public String login(@Validated LoginForm form, BindingResult result, Model model,String hidden) {
 		if(result.hasErrors()) {
 			return toLogin();
 		}
-		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
-		if (administrator == null) {
-			result.addError(new ObjectError("loginError", "メールアドレスまたはパスワードが不正です。"));
-			return toLogin();
+		String checkToken = (String)session.getAttribute("token");
+		if(checkToken.equals(hidden)) {
+			session.removeAttribute("token");
+			Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
+			if (administrator == null) {
+				result.addError(new ObjectError("loginError", "メールアドレスまたはパスワードが不正です。"));
+				return toLogin();
+			}
 		}
 		return "forward:/employee/showList";
 	}
