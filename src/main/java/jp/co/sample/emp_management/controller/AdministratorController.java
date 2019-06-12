@@ -88,7 +88,7 @@ public class AdministratorController {
 			BeanUtils.copyProperties(form, administrator);
 			administratorService.insert(administrator);
 		}
-		return "administrator/login";
+		return toLogin();
 	}
 
 	/////////////////////////////////////////////////////
@@ -129,7 +129,7 @@ public class AdministratorController {
 				return toLogin();
 			}
 		}
-		return "forward:/employee/showList";
+		return "redirect:employee/showList";
 	}
 	
 	/////////////////////////////////////////////////////
