@@ -60,7 +60,7 @@
 											メールアドレスを入力してください
 										</label>
 										<input type="text" name="mailAddress" id="mailAddress" class="form-control" placeholder="yamada@mail.com"
-											 th:field="*{mailAddress}" th:errorclass="error-input" value="yamada@mail.com">
+											 th:field="*{mailAddress}" th:errorclass="error-input" value="yamada@mail.com" th:value="*{mailAddress}">
 									</div>
 								</div>
 							</div>
@@ -75,7 +75,7 @@
 											パスワードを入力してください
 										</label>
 										<input type="password" name="password" id="password" class="form-control" placeholder="password"
-											 th:field="*{password}" th:errorclass="error-input" value="xxxxxxxx">
+											 th:field="*{password}" th:errorclass="error-input" value="xxxxxxxx" th:value="*{password}">
 									</div>
 								</div>
 							</div>
