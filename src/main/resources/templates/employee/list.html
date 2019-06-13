@@ -63,7 +63,7 @@
 <!-- ここから上を編集する必要はありません -->
 
 <!-- ここにモックのtable要素を貼り付けます -->
-			<form th:action="@{/employee/findLike}" method="post">
+			<form th:action="@{/employee/findByLikeName}" method="post">
 				<table class="table table-striped">
 					<thead>
 						<tr>
@@ -76,6 +76,7 @@
 						</tr>
 					</thead>
 					<tbody>
+						<tr><td colspan="3" th:if="${notFindEmployee != null}" th:text="${notFindEmployee}" class="alert alert-danger">エラー！</td></tr>
 						<tr th:each="employee : ${employeeList}">
 							<td>
 								<a href="detail.html" th:href="@{'/employee/showDetail?id=' + ${employee.id}}">
