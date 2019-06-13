@@ -93,10 +93,14 @@ public class EmployeeController {
 		return "redirect:/employee/showList";
 	}
 	
-	@RequestMapping("/findLike")
-	public String findLike(String name,Model model) {
-		List<Employee> employeeList = employeeService.findLike(name);
-		model.addAttribute("employeeList", employeeList);
+	@RequestMapping("/findByLikeName")
+	public String findByLikeName(String name,Model model) {
+		List<Employee> employeeList = employeeService.findByLikeName(name);
+		if(employeeList.size()==0) {
+			model.addAttribute("notFindEmployee","一致する従業員が見つかりませんでした。");
+		}else {
+			model.addAttribute("employeeList", employeeList);
+		}
 		return "employee/list";
 	}
 }
