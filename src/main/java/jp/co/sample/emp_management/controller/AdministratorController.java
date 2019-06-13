@@ -135,7 +135,7 @@ public class AdministratorController extends WebSecurityConfigurerAdapter{
 			return toLogin();
 		}
 		Administrator administrator = administratorService.findMailAddress(form.getMailAddress());
-		if (administratorService.matchedPassword(form.getPassword(),(administratorService.findMailAddress(form.getMailAddress()).getPassword()))) {
+		if (administratorService.matchedPassword(form.getPassword(),(administrator.getPassword()))) {
 			session.setAttribute("administratorName", administrator.getName());
 			return "redirect:employee/showList";
 		}
