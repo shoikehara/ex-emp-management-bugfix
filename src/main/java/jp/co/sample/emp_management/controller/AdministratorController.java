@@ -87,22 +87,20 @@ public class AdministratorController extends WebSecurityConfigurerAdapter{
 		if(result.hasErrors()) {
 			return toInsert();
 		}
+		if(!(administratorService.findMailAddress(form.getMailAddress())==null)) {
+			model.addAttribute("insertError", "既に登録されているメールアドレスです。");
+			return toInsert();
+		}
+		if(form.getPassword().equals(form.getCheckPassword())) {
+			model.addAttribute("checkPasswordError", "入力したパスワードが一致しません");
+			return toInsert();
+		}
 		String checkToken = (String)session.getAttribute("token");
-		if(checkToken.equals(token)) {
-			if(administratorService.findMailAddress(form.getMailAddress())==null) {
-				if(form.getPassword().equals(form.getCheckPassword())) {
-					session.removeAttribute("token");
-					Administrator administrator = new Administrator();
-					BeanUtils.copyProperties(form, administrator);
-					administratorService.insert(administrator);
-				}else {
-					model.addAttribute("checkPasswordError", "入力したメールアドレスが一致しません");
-					return toInsert();
-				}
-			}else {
-				model.addAttribute("insertError", "既に登録されているメールアドレスです。");
-				return toInsert();
-			}
+		if(checkToken.equals(token)) {	
+			session.removeAttribute("token");
+			Administrator administrator = new Administrator();
+			BeanUtils.copyProperties(form, administrator);
+			administratorService.insert(administrator);			
 		}
 		return toLogin();
 	}
