@@ -6,6 +6,8 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,7 +28,15 @@ import jp.co.sample.emp_management.service.AdministratorService;
  */
 @Controller
 @RequestMapping("/")
-public class AdministratorController {
+public class AdministratorController extends WebSecurityConfigurerAdapter{
+    @Override
+    protected void configure(HttpSecurity http) throws Exception{
+        http.authorizeRequests().antMatchers("/").permitAll();
+//        http.authorizeRequests()
+//        .and()
+//        .exceptionHandling()
+//        .accessDeniedPage("/");
+    }
 
 	@Autowired
 	private AdministratorService administratorService;
@@ -79,10 +89,10 @@ public class AdministratorController {
 		}
 		String checkToken = (String)session.getAttribute("token");
 		if(checkToken.equals(token)) {
-			Administrator administrator = administratorService.findMailAddress(form.getMailAddress());
-			if(administrator == null) {
+			if(administratorService.findMailAddress(form.getMailAddress())==null) {
 				if(form.getPassword().equals(form.getCheckPassword())) {
 					session.removeAttribute("token");
+					Administrator administrator = new Administrator();
 					BeanUtils.copyProperties(form, administrator);
 					administratorService.insert(administrator);
 				}else {
@@ -124,13 +134,13 @@ public class AdministratorController {
 		if(result.hasErrors()) {
 			return toLogin();
 		}
-		Administrator administrator = administratorService.login(form.getMailAddress(), form.getPassword());
-		if (administrator == null) {
-			model.addAttribute("loginError", "メールアドレスまたはパスワードが不正です。");
-			return toLogin();
+		Administrator administrator = administratorService.findMailAddress(form.getMailAddress());
+		if (administratorService.matchedPassword(form.getPassword(),(administratorService.findMailAddress(form.getMailAddress()).getPassword()))) {
+			session.setAttribute("administratorName", administrator.getName());
+			return "redirect:employee/showList";
 		}
-		session.setAttribute("administratorName", administrator.getName());
-		return "redirect:employee/showList";
+		model.addAttribute("loginError", "メールアドレスまたはパスワードが不正です。");
+		return toLogin();
 	}
 	
 	/////////////////////////////////////////////////////
