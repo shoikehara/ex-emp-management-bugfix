@@ -63,9 +63,12 @@
 <!-- ここから上を編集する必要はありません -->
 
 <!-- ここにモックのtable要素を貼り付けます -->
-
+			<form th:action="@{/employee/findLike}" method="post">
 				<table class="table table-striped">
 					<thead>
+						<tr>
+							<th><input type="text" name="name"></th><th><input type="submit" value="検索"></th>
+						</tr>
 						<tr>
 							<th>従業員名</th>
 							<th>入社日</th>
@@ -88,6 +91,7 @@
 						</tr>
 					</tbody>
 				</table>
+			</form>
 
 
 <!-- ここから下を編集する必要はありません -->

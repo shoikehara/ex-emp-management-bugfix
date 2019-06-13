@@ -92,4 +92,11 @@ public class EmployeeController {
 		employeeService.update(employee);
 		return "redirect:/employee/showList";
 	}
+	
+	@RequestMapping("/findLike")
+	public String findLike(String name,Model model) {
+		List<Employee> employeeList = employeeService.findLike(name);
+		model.addAttribute("employeeList", employeeList);
+		return "employee/list";
+	}
 }
