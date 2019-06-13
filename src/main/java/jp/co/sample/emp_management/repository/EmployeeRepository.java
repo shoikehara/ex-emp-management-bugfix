@@ -84,7 +84,7 @@ public class EmployeeRepository {
 		template.update(updateSql, param);
 	}
 	
-	public List<Employee> findLike(String name){
+	public List<Employee> findByLikeName(String name){
 		String sql="select id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count FROM employees where name like :name order by hire_date asc";
 		SqlParameterSource param = new MapSqlParameterSource()
 				.addValue("name", "%"+name+"%");
