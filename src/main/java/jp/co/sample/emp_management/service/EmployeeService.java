@@ -1,10 +1,18 @@
 package jp.co.sample.emp_management.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import jp.co.sample.emp_management.domain.Employee;
 import jp.co.sample.emp_management.repository.EmployeeRepository;
@@ -21,6 +29,17 @@ public class EmployeeService {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
+	
+	public void saveFile(MultipartFile file) {
+		String fileName = file.getOriginalFilename();
+		Path uploadfile = Paths.get("src/main/resources/static/img/" + fileName);
+		try (OutputStream os = Files.newOutputStream(uploadfile, StandardOpenOption.CREATE)) {
+			byte[] bytes = file.getBytes();
+			os.write(bytes);
+		} catch (IOException e) {
+				e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * 従業員情報を全件取得します.
@@ -55,5 +74,9 @@ public class EmployeeService {
 	
 	public List<Employee> findByLikeName(String name){
 		return employeeRepository.findByLikeName(name);
+	}
+	
+	public void insert(Employee employee) {
+		employeeRepository.insert(employee);
 	}
 }
