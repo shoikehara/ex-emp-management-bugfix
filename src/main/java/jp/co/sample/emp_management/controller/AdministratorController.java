@@ -84,21 +84,20 @@ public class AdministratorController extends WebSecurityConfigurerAdapter{
 	 */
 	@RequestMapping("/insert")
 	public String insert(@Validated InsertAdministratorForm form,BindingResult result,String token,Model model) {
+		Administrator administrator = administratorService.findMailAddress(form.getMailAddress());
+		if(administrator!=null) {
+			result.rejectValue("mailAddress",null, "既に登録されているメールアドレスです。");
+		}
+		if(!(form.getPassword().equals(form.getCheckPassword()))) {
+			result.rejectValue("password",null, "入力したパスワードが一致しません");
+		}
 		if(result.hasErrors()) {
-			return toInsert();
-		}
-		if(!(administratorService.findMailAddress(form.getMailAddress())==null)) {
-			model.addAttribute("insertError", "既に登録されているメールアドレスです。");
-			return toInsert();
-		}
-		if(form.getPassword().equals(form.getCheckPassword())) {
-			model.addAttribute("checkPasswordError", "入力したパスワードが一致しません");
 			return toInsert();
 		}
 		String checkToken = (String)session.getAttribute("token");
 		if(checkToken.equals(token)) {	
 			session.removeAttribute("token");
-			Administrator administrator = new Administrator();
+			administrator = new Administrator();
 			BeanUtils.copyProperties(form, administrator);
 			administratorService.insert(administrator);			
 		}
