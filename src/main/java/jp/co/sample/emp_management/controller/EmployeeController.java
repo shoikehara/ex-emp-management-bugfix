@@ -1,7 +1,10 @@
 package jp.co.sample.emp_management.controller;
 
+import java.io.IOException;
+import java.sql.Date;
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jp.co.sample.emp_management.domain.Employee;
+import jp.co.sample.emp_management.form.InsertEmployeeForm;
 import jp.co.sample.emp_management.form.UpdateEmployeeForm;
 import jp.co.sample.emp_management.service.EmployeeService;
 
@@ -35,6 +39,10 @@ public class EmployeeController {
 	@ModelAttribute
 	public UpdateEmployeeForm setUpForm() {
 		return new UpdateEmployeeForm();
+	}
+	@ModelAttribute
+	public InsertEmployeeForm insertForm() {
+		return new InsertEmployeeForm();
 	}
 
 	/////////////////////////////////////////////////////
@@ -102,5 +110,24 @@ public class EmployeeController {
 			model.addAttribute("employeeList", employeeList);
 		}
 		return "employee/list";
+	}
+	
+	@RequestMapping("/toInsert")
+	public String toInsert() {
+		return "employee/insert";
+	}
+	
+	@RequestMapping("/insert")
+	public String insert(InsertEmployeeForm form,Model model) throws IllegalStateException, IOException {
+		Employee employee = new Employee();
+		BeanUtils.copyProperties(form, employee);
+		employee.setId(employeeService.showList().size()+1);
+		employee.setImage(form.getImage().getOriginalFilename());
+		employeeService.saveFile(form.getImage());
+		employee.setHireDate(Date.valueOf(form.getHireDate()));
+		employee.setSalary(Integer.parseInt(form.getSalary()));
+		employee.setDependentsCount(Integer.parseInt(form.getDependentsCount()));
+		employeeService.insert(employee);
+		return "redirect:/employee/showList";
 	}
 }
