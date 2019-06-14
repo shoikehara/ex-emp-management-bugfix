@@ -106,6 +106,8 @@ public class EmployeeController {
 		List<Employee> employeeList = employeeService.findByLikeName(name);
 		if(employeeList.size()==0) {
 			model.addAttribute("notFindEmployee","一致する従業員が見つかりませんでした。");
+			employeeList = employeeService.showList();
+			model.addAttribute("employeeList",employeeList);
 		}else {
 			model.addAttribute("employeeList", employeeList);
 		}
@@ -121,12 +123,12 @@ public class EmployeeController {
 	public String insert(InsertEmployeeForm form,Model model) throws IllegalStateException, IOException {
 		Employee employee = new Employee();
 		BeanUtils.copyProperties(form, employee);
-		employee.setId(employeeService.showList().size()+1);
+		employee.setId(employeeService.getMaxId()+1);
 		employee.setImage(form.getImage().getOriginalFilename());
-		employeeService.saveFile(form.getImage());
 		employee.setHireDate(Date.valueOf(form.getHireDate()));
 		employee.setSalary(Integer.parseInt(form.getSalary()));
 		employee.setDependentsCount(Integer.parseInt(form.getDependentsCount()));
+		employeeService.saveFile(form.getImage());
 		employeeService.insert(employee);
 		return "redirect:/employee/showList";
 	}

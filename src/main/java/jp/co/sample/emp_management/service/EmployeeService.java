@@ -1,6 +1,5 @@
 package jp.co.sample.emp_management.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -78,5 +77,13 @@ public class EmployeeService {
 	
 	public void insert(Employee employee) {
 		employeeRepository.insert(employee);
+	}
+	
+	public List<String> getAllNames(){
+		return employeeRepository.getAllNames();
+	}
+	
+	public Integer getMaxId() {
+		return employeeRepository.getMaxId();
 	}
 }

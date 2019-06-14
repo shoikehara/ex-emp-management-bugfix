@@ -1,5 +1,6 @@
 package jp.co.sample.emp_management.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,5 +98,29 @@ public class EmployeeRepository {
 				+ "values(:id,:name,:image,:gender,:hireDate,:mailAddress,:zipCode,:address,:telephone,:salary,:characteristics,:dependentsCount)";
 		SqlParameterSource param = new BeanPropertySqlParameterSource(employee);
 		template.update(sql, param);
+	}
+	
+	public List<String> getAllNames(){
+		String sql = "select id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count from employees";
+		SqlParameterSource param = new MapSqlParameterSource();
+		List<Employee> employeeList = template.query(sql, param, EMPLOYEE_ROW_MAPPER);
+		List<String> nameList = new ArrayList<>();
+		for(Employee employee : employeeList) {
+			nameList.add(employee.getName());
+		}
+		return nameList;
+	}
+	
+	public Integer getMaxId() {
+		String sql = "select id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count from employees";
+		SqlParameterSource param = new MapSqlParameterSource();
+		List<Employee> employeeList = template.query(sql, param, EMPLOYEE_ROW_MAPPER);
+		Integer maxId = 0;
+		for(Employee employee : employeeList) {
+			if(maxId < employee.getId()) {
+				maxId = employee.getId();
+			}
+		}
+		return maxId;
 	}
 }
