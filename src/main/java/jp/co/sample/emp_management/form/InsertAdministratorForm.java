@@ -20,9 +20,10 @@ public class InsertAdministratorForm {
 	private String mailAddress;
 	/** パスワード */
 	@Size(min=4,max=30,message="パスワードは4文字以上30文字以下で入力してください")
+	@NotBlank(message="パスワードを入力してください")
 	private String password;
 	
-	@NotBlank(message="パスワードを入力してください")
+	@NotBlank(message="確認用パスワードを入力してください")
 	private String checkPassword;
 	
 	public String getName() {
