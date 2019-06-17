@@ -3,6 +3,7 @@ package jp.co.sample.emp_management.form;
 import org.springframework.web.multipart.MultipartFile;
 
 public class InsertEmployeeForm {
+	private String id;
 	private String name;
 	private MultipartFile image;
 	private String gender;
@@ -15,6 +16,12 @@ public class InsertEmployeeForm {
 	private String characteristics;
 	private String dependentsCount;
 	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 	public String getName() {
 		return name;
 	}

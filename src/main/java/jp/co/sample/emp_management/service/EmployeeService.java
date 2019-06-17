@@ -49,6 +49,14 @@ public class EmployeeService {
 		List<Employee> employeeList = employeeRepository.findAll();
 		return employeeList;
 	}
+	public List<Employee> showList(Integer offset) {
+		if(offset == null) {
+			offset = 1;
+		}
+		offset = offset *10 - 10;
+		List<Employee> employeeList = employeeRepository.findAll(offset);
+		return employeeList;
+	}
 	
 	/**
 	 * 従業員情報を取得します.
@@ -81,9 +89,5 @@ public class EmployeeService {
 	
 	public List<String> getAllNames(){
 		return employeeRepository.getAllNames();
-	}
-	
-	public Integer getMaxId() {
-		return employeeRepository.getMaxId();
-	}
+	}	
 }

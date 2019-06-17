@@ -2,10 +2,13 @@ package jp.co.sample.emp_management.controller;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +30,18 @@ import jp.co.sample.emp_management.service.EmployeeService;
 @Controller
 @RequestMapping("/employee")
 public class EmployeeController {
+	public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers(
+                            "/img/**",
+                            "/css/**",
+                            "/javascript/**");
+    }
+    protected void configure(HttpSecurity http) throws Exception {
+        // 認可の設定
+        http.authorizeRequests()
+            .antMatchers("/").permitAll() // indexは全ユーザーアクセス許可
+            .anyRequest().authenticated();  // それ以外は全て認証無しの場合アクセス不許可
+    }
 
 	@Autowired
 	private EmployeeService employeeService;
@@ -55,9 +70,17 @@ public class EmployeeController {
 	 * @return 従業員一覧画面
 	 */
 	@RequestMapping("/showList")
-	public String showList(Model model) {
-		List<Employee> employeeList = employeeService.showList();
+	public String showList(Model model,Integer offset) {
+		List<Employee> allEmployeeList = employeeService.showList();
+		List<Employee> employeeList = employeeService.showList(offset);
+		List<Integer> pageList = new ArrayList<>();
+		for(int i = 1;i <=(allEmployeeList.size()/10)+1;i++) {
+			pageList.add(i);
+		}
+		List<String> nameList = employeeService.getAllNames();
 		model.addAttribute("employeeList", employeeList);
+		model.addAttribute("nameList",nameList);
+		model.addAttribute("pageList",pageList);
 		return "employee/list";
 	}
 
@@ -102,8 +125,8 @@ public class EmployeeController {
 	}
 	
 	@RequestMapping("/findByLikeName")
-	public String findByLikeName(String name,Model model) {
-		List<Employee> employeeList = employeeService.findByLikeName(name);
+	public String findByLikeName(String search,Model model) {
+		List<Employee> employeeList = employeeService.findByLikeName(search);
 		if(employeeList.size()==0) {
 			model.addAttribute("notFindEmployee","一致する従業員が見つかりませんでした。");
 			employeeList = employeeService.showList();
@@ -123,7 +146,6 @@ public class EmployeeController {
 	public String insert(InsertEmployeeForm form,Model model) throws IllegalStateException, IOException {
 		Employee employee = new Employee();
 		BeanUtils.copyProperties(form, employee);
-		employee.setId(employeeService.getMaxId()+1);
 		employee.setImage(form.getImage().getOriginalFilename());
 		employee.setHireDate(Date.valueOf(form.getHireDate()));
 		employee.setSalary(Integer.parseInt(form.getSalary()));

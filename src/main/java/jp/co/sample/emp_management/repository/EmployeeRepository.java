@@ -41,6 +41,8 @@ public class EmployeeRepository {
 		employee.setDependentsCount(rs.getInt("dependents_count"));
 		return employee;
 	};
+	
+	private static final Integer ELEMENT_COUNT=10; 
 
 	@Autowired
 	private NamedParameterJdbcTemplate template;
@@ -50,11 +52,18 @@ public class EmployeeRepository {
 	 * 
 	 * @return 全従業員一覧 従業員が存在しない場合はサイズ0件の従業員一覧を返します
 	 */
+	
 	public List<Employee> findAll() {
 		String sql = "SELECT id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count FROM employees order by hire_date asc";
-
 		List<Employee> developmentList = template.query(sql, EMPLOYEE_ROW_MAPPER);
-
+		return developmentList;
+	}
+	public List<Employee> findAll(Integer offset) {
+		String sql = "SELECT id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count FROM employees order by hire_date asc limit :element offset :offset";
+		SqlParameterSource param = new MapSqlParameterSource()
+				.addValue("offset", offset)
+				.addValue("element",ELEMENT_COUNT);
+		List<Employee> developmentList = template.query(sql,param, EMPLOYEE_ROW_MAPPER);
 		return developmentList;
 	}
 
@@ -95,7 +104,7 @@ public class EmployeeRepository {
 	
 	public void insert(Employee employee) {
 		String sql="insert into employees(id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count) "
-				+ "values(:id,:name,:image,:gender,:hireDate,:mailAddress,:zipCode,:address,:telephone,:salary,:characteristics,:dependentsCount)";
+				+ "values((select max(id) from employees)+1,:name,:image,:gender,:hireDate,:mailAddress,:zipCode,:address,:telephone,:salary,:characteristics,:dependentsCount)";
 		SqlParameterSource param = new BeanPropertySqlParameterSource(employee);
 		template.update(sql, param);
 	}
@@ -109,18 +118,5 @@ public class EmployeeRepository {
 			nameList.add(employee.getName());
 		}
 		return nameList;
-	}
-	
-	public Integer getMaxId() {
-		String sql = "select id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count from employees";
-		SqlParameterSource param = new MapSqlParameterSource();
-		List<Employee> employeeList = template.query(sql, param, EMPLOYEE_ROW_MAPPER);
-		Integer maxId = 0;
-		for(Employee employee : employeeList) {
-			if(maxId < employee.getId()) {
-				maxId = employee.getId();
-			}
-		}
-		return maxId;
 	}
 }

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,13 +30,27 @@ import jp.co.sample.emp_management.service.AdministratorService;
 @Controller
 @RequestMapping("/")
 public class AdministratorController extends WebSecurityConfigurerAdapter{
-    @Override
+	@Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers(
+                            "/img/**",
+                            "/css/**",
+                            "/javascript/**");
+	}
+	@Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.formLogin()
+        .loginProcessingUrl("/")   // 認証処理のパス
+        .loginPage("/")            // ログインフォームのパス
+        .failureUrl("/")       // 認証失敗時に呼ばれるハンドラクラス
+        .defaultSuccessUrl("/employee/showList");     // 認証成功時の遷移先
+    }
+	
+	@Override
     protected void configure(HttpSecurity http) throws Exception{
-        http.authorizeRequests().antMatchers("/").permitAll();
-//        http.authorizeRequests()
-//        .and()
-//        .exceptionHandling()
-//        .accessDeniedPage("/");
+        http.authorizeRequests().antMatchers("/","/toInsert").permitAll()
+        .anyRequest().authenticated();
+        
     }
 
 	@Autowired

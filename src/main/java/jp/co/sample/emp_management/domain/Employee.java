@@ -8,7 +8,7 @@ import java.util.Date;
  * @author igamasayuki
  * 
  */
-public class Employee {
+public class Employee{
 	/** id */
 	private Integer id;
 	/** 従業員名 */
