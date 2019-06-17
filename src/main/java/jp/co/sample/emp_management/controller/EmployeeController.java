@@ -36,13 +36,16 @@ public class EmployeeController {
                             "/css/**",
                             "/javascript/**");
     }
-    protected void configure(HttpSecurity http) throws Exception {
-        // 認可の設定
-        http.authorizeRequests()
-            .antMatchers("/").permitAll() // indexは全ユーザーアクセス許可
-            .anyRequest().authenticated();  // それ以外は全て認証無しの場合アクセス不許可
+	protected void configure(HttpSecurity http) throws Exception{
+        http.authorizeRequests().antMatchers("/","/toInsert").permitAll()
+        .anyRequest().authenticated();
+        http.formLogin()
+        .loginProcessingUrl("/")   // 認証処理のパス
+        .loginPage("/")            // ログインフォームのパス
+        .failureUrl("/")       // 認証失敗時に呼ばれるハンドラクラス
+        .defaultSuccessUrl("/employee/showList");     // 認証成功時の遷移先
     }
-
+	
 	@Autowired
 	private EmployeeService employeeService;
 	

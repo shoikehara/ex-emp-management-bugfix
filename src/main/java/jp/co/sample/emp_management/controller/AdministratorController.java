@@ -37,20 +37,16 @@ public class AdministratorController extends WebSecurityConfigurerAdapter{
                             "/css/**",
                             "/javascript/**");
 	}
-	@Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.formLogin()
-        .loginProcessingUrl("/")   // 認証処理のパス
-        .loginPage("/")            // ログインフォームのパス
-        .failureUrl("/")       // 認証失敗時に呼ばれるハンドラクラス
-        .defaultSuccessUrl("/employee/showList");     // 認証成功時の遷移先
-    }
 	
 	@Override
     protected void configure(HttpSecurity http) throws Exception{
         http.authorizeRequests().antMatchers("/","/toInsert").permitAll()
         .anyRequest().authenticated();
-        
+        http.formLogin()
+        .loginProcessingUrl("/")   // 認証処理のパス
+        .loginPage("/")            // ログインフォームのパス
+        .failureUrl("/")       // 認証失敗時に呼ばれるハンドラクラス
+        .defaultSuccessUrl("/employee/showList");     // 認証成功時の遷移先
     }
 
 	@Autowired
