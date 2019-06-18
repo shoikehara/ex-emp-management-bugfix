@@ -3,17 +3,29 @@ package jp.co.sample.emp_management.form;
 import org.springframework.web.multipart.MultipartFile;
 
 public class InsertEmployeeForm {
+	/**従業員ID*/
 	private String id;
+	/**従業員名*/
 	private String name;
+	/**プロフィール画像*/
 	private MultipartFile image;
+	/**性別*/
 	private String gender;
+	/**入社日*/
 	private String hireDate;
+	/**メールアドレス*/
 	private String mailAddress;
+	/**郵便番号*/
 	private String zipCode;
+	/**住所*/
 	private String Address;
+	/**電話番号*/
 	private String telephone;
+	/**給料*/
 	private String salary;
+	/**特徴*/
 	private String characteristics;
+	/**扶養人数*/
 	private String dependentsCount;
 	
 	public String getId() {

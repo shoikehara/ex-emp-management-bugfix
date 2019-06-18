@@ -6,15 +6,13 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.co.sample.emp_management.domain.Administrator;
 import jp.co.sample.emp_management.form.InsertAdministratorForm;
@@ -22,33 +20,14 @@ import jp.co.sample.emp_management.form.LoginForm;
 import jp.co.sample.emp_management.service.AdministratorService;
 
 /**
- * 管理者情報を操作するコントローラー.
+ * 管理者情報を管理するコントローラクラス.
  * 
- * @author igamasayuki
+ * @author sho.ikehara
  *
  */
 @Controller
 @RequestMapping("/")
-public class AdministratorController extends WebSecurityConfigurerAdapter{
-	@Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(
-                            "/img/**",
-                            "/css/**",
-                            "/javascript/**");
-	}
-	
-	@Override
-    protected void configure(HttpSecurity http) throws Exception{
-        http.authorizeRequests().antMatchers("/","/toInsert").permitAll()
-        .anyRequest().authenticated();
-        http.formLogin()
-        .loginProcessingUrl("/")   // 認証処理のパス
-        .loginPage("/")            // ログインフォームのパス
-        .failureUrl("/")       // 認証失敗時に呼ばれるハンドラクラス
-        .defaultSuccessUrl("/employee/showList");     // 認証成功時の遷移先
-    }
-
+public class AdministratorController{
 	@Autowired
 	private AdministratorService administratorService;
 	
@@ -112,7 +91,7 @@ public class AdministratorController extends WebSecurityConfigurerAdapter{
 			BeanUtils.copyProperties(form, administrator);
 			administratorService.insert(administrator);			
 		}
-		return toLogin();
+		return toLogin(model,null);
 	}
 
 	/////////////////////////////////////////////////////
@@ -124,32 +103,34 @@ public class AdministratorController extends WebSecurityConfigurerAdapter{
 	 * @return ログイン画面
 	 */
 	@RequestMapping("/")
-	public String toLogin() {
+	public String toLogin(Model model,@RequestParam(required = false) String error) {
+		if(error != null) {
+			model.addAttribute("loginError", "メールアドレスまたはパスワードが不正です。");
+		}
 		return "administrator/login";
 	}
 
-	/**
-	 * ログインします.
-	 * 
-	 * @param form
-	 *            管理者情報用フォーム
-	 * @param result
-	 *            エラー情報格納用オブッジェクト
-	 * @return ログイン後の従業員一覧画面
-	 */
-	@RequestMapping("/login")
-	public String login(@Validated LoginForm form, BindingResult result, Model model) {
-		if(result.hasErrors()) {
-			return toLogin();
-		}
-		Administrator administrator = administratorService.findMailAddress(form.getMailAddress());
-		if (administratorService.matchedPassword(form.getPassword(),(administrator.getPassword()))) {
-			session.setAttribute("administratorName", administrator.getName());
-			return "redirect:employee/showList";
-		}
-		model.addAttribute("loginError", "メールアドレスまたはパスワードが不正です。");
-		return toLogin();
-	}
+//	/**
+//	 * ログインします.
+//	 * 
+//	 * @param form
+//	 *            管理者情報用フォーム
+//	 * @param result
+//	 *            エラー情報格納用オブッジェクト
+//	 * @return ログイン後の従業員一覧画面
+//	 */
+//	@RequestMapping("/login")
+//	public String login(@Validated LoginForm form, BindingResult result, Model model) {
+//		if(result.hasErrors()) {
+//			return toLogin();
+//		}
+//		Administrator administrator = administratorService.findMailAddress(form.getMailAddress());
+//		if (administratorService.matchedPassword(form.getPassword(),(administrator.getPassword()))) {
+//			return "redirect:employee/showList";
+//		}
+//		model.addAttribute("loginError", "メールアドレスまたはパスワードが不正です。");
+//		return toLogin();
+//	}
 	
 	/////////////////////////////////////////////////////
 	// ユースケース：ログアウトをする
@@ -164,5 +145,4 @@ public class AdministratorController extends WebSecurityConfigurerAdapter{
 		session.invalidate();
 		return "redirect:/";
 	}
-	
 }

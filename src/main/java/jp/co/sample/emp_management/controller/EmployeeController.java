@@ -7,8 +7,6 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import jp.co.sample.emp_management.constant.Constant;
 import jp.co.sample.emp_management.domain.Employee;
 import jp.co.sample.emp_management.form.InsertEmployeeForm;
 import jp.co.sample.emp_management.form.UpdateEmployeeForm;
@@ -30,22 +29,6 @@ import jp.co.sample.emp_management.service.EmployeeService;
 @Controller
 @RequestMapping("/employee")
 public class EmployeeController {
-	public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(
-                            "/img/**",
-                            "/css/**",
-                            "/javascript/**");
-    }
-	protected void configure(HttpSecurity http) throws Exception{
-        http.authorizeRequests().antMatchers("/","/toInsert").permitAll()
-        .anyRequest().authenticated();
-        http.formLogin()
-        .loginProcessingUrl("/")   // 認証処理のパス
-        .loginPage("/")            // ログインフォームのパス
-        .failureUrl("/")       // 認証失敗時に呼ばれるハンドラクラス
-        .defaultSuccessUrl("/employee/showList");     // 認証成功時の遷移先
-    }
-	
 	@Autowired
 	private EmployeeService employeeService;
 	
@@ -73,11 +56,11 @@ public class EmployeeController {
 	 * @return 従業員一覧画面
 	 */
 	@RequestMapping("/showList")
-	public String showList(Model model,Integer offset) {
+	public String showList(Model model,Integer page) {
 		List<Employee> allEmployeeList = employeeService.showList();
-		List<Employee> employeeList = employeeService.showList(offset);
+		List<Employee> employeeList = employeeService.showList(page);
 		List<Integer> pageList = new ArrayList<>();
-		for(int i = 1;i <=(allEmployeeList.size()/10)+1;i++) {
+		for(int i = 1;i <=(allEmployeeList.size()/Constant.ELEMENT_COUNT)+1;i++) {
 			pageList.add(i);
 		}
 		List<String> nameList = employeeService.getAllNames();
@@ -145,6 +128,15 @@ public class EmployeeController {
 		return "employee/insert";
 	}
 	
+	/**
+	 * 従業員登録をする.
+	 * 
+	 * @param form　入力値
+	 * @param model　モデル
+	 * @return　従業員一覧
+	 * @throws IllegalStateException
+	 * @throws IOException
+	 */
 	@RequestMapping("/insert")
 	public String insert(InsertEmployeeForm form,Model model) throws IllegalStateException, IOException {
 		Employee employee = new Employee();

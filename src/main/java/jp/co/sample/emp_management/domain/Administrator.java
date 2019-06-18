@@ -19,8 +19,7 @@ public class Administrator {
 	/**
 	 * 引数無しのコンストラクタ.
 	 */
-	public Administrator() {
-	}
+	public Administrator() {}
 
 	/**
 	 * 初期化用コンストラクタ.

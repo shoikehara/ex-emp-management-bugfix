@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import jp.co.sample.emp_management.constant.Constant;
 import jp.co.sample.emp_management.domain.Employee;
 
 /**
@@ -42,8 +43,6 @@ public class EmployeeRepository {
 		return employee;
 	};
 	
-	private static final Integer ELEMENT_COUNT=10; 
-
 	@Autowired
 	private NamedParameterJdbcTemplate template;
 
@@ -58,13 +57,20 @@ public class EmployeeRepository {
 		List<Employee> developmentList = template.query(sql, EMPLOYEE_ROW_MAPPER);
 		return developmentList;
 	}
+	
+	/**
+	 * ページネーションをする際に10件ごとに従業員情報を取得する.
+	 * 
+	 * @param offset ページ番号(データのスタート位置)
+	 * @return　従業員リスト(10件)
+	 */
 	public List<Employee> findAll(Integer offset) {
 		String sql = "SELECT id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count FROM employees order by hire_date asc limit :element offset :offset";
 		SqlParameterSource param = new MapSqlParameterSource()
 				.addValue("offset", offset)
-				.addValue("element",ELEMENT_COUNT);
-		List<Employee> developmentList = template.query(sql,param, EMPLOYEE_ROW_MAPPER);
-		return developmentList;
+				.addValue("element",Constant.ELEMENT_COUNT);
+		List<Employee> employeeList = template.query(sql,param, EMPLOYEE_ROW_MAPPER);
+		return employeeList;
 	}
 
 	/**
@@ -94,6 +100,12 @@ public class EmployeeRepository {
 		template.update(updateSql, param);
 	}
 	
+	/**
+	 * あいまい検索を行う.
+	 * 
+	 * @param name 入力された名前の文字列.
+	 * @return 従業員リスト
+	 */
 	public List<Employee> findByLikeName(String name){
 		String sql="select id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count FROM employees where name like :name order by hire_date asc";
 		SqlParameterSource param = new MapSqlParameterSource()

@@ -17,9 +17,9 @@ import jp.co.sample.emp_management.domain.Employee;
 import jp.co.sample.emp_management.repository.EmployeeRepository;
 
 /**
- * 従業員情報を操作するサービス.
+ * 従業員情報を操作するサービスクラス.
  * 
- * @author igamasayuki
+ * @author sho.ikehara
  *
  */
 @Service
@@ -29,6 +29,11 @@ public class EmployeeService {
 	@Autowired
 	private EmployeeRepository employeeRepository;
 	
+	/**
+	 * 従業員登録時に選択された画像を保存する.
+	 * 
+	 * @param file　画像ファイル
+	 */
 	public void saveFile(MultipartFile file) {
 		String fileName = file.getOriginalFilename();
 		Path uploadfile = Paths.get("src/main/resources/static/img/" + fileName);
@@ -49,6 +54,12 @@ public class EmployeeService {
 		List<Employee> employeeList = employeeRepository.findAll();
 		return employeeList;
 	}
+	/**
+	 * ページネーションの際に使用する10件検索.
+	 * 
+	 * @param offset ページ番号(スタート位置)
+	 * @return　従業員リスト(10件)
+	 */
 	public List<Employee> showList(Integer offset) {
 		if(offset == null) {
 			offset = 1;
@@ -79,14 +90,30 @@ public class EmployeeService {
 		employeeRepository.update(employee);
 	}
 	
+	/**
+	 * あいまい検索を行う.
+	 * 
+	 * @param name 入力された名前の文字列
+	 * @return　従業員リスト
+	 */
 	public List<Employee> findByLikeName(String name){
 		return employeeRepository.findByLikeName(name);
 	}
 	
+	/**
+	 * 従業員登録を行う.
+	 * 
+	 * @param employee 入力された従業員情報
+	 */
 	public void insert(Employee employee) {
 		employeeRepository.insert(employee);
 	}
 	
+	/**
+	 * オートコンプリートを実装する際に使用する名前一覧.
+	 * 
+	 * @return 従業員名一覧
+	 */
 	public List<String> getAllNames(){
 		return employeeRepository.getAllNames();
 	}	

@@ -9,9 +9,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 
+/**
+ * エラー時のページ遷移を行うハンドラークラス.
+ * 
+ * @author sho.ikehara
+ *
+ */
 @Component
 public class GlobalExceptionHandler implements HandlerExceptionResolver {
-
 	private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	@Override
